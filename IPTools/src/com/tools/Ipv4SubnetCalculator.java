@@ -6,29 +6,20 @@ public class Ipv4SubnetCalculator extends IpTools {
         super(ipAddress, prefix);
     }
 
-    protected String decimalToBinary(String decimal){
-        String[] octet = decimal.split("\\.");
-        String finalBinary = "";
-        for(int i = 0; i < 4; i++){
-            String binary = Integer.toBinaryString(Integer.parseInt(octet[i]));
-            while(binary.length() < 8){
-                binary = "0" + binary;
+    protected boolean checkIpAddress(){
+        for (String octet : getIpAddress()){
+            if (octet.equals("") || Integer.parseInt(octet) > 255 || Integer.parseInt(octet) < 0){
+                return false;
             }
-
-            finalBinary += binary + (i <=2 ? "." : "");
         }
-
-        return finalBinary;
+        return true;
     }
 
-    protected String binaryToDecimal(String binary){
-        String[] octet = binary.split("\\.");
-        String finalDecimal = "";
-        for(int i = 0; i < 4; i++){
-            finalDecimal += Integer.parseInt(octet[i], 2) + (i <= 2 ? "." : "");
+    protected boolean checkPrefix(){
+        if (!getPrefix().equals("")){
+            return Integer.parseInt(getPrefix()) >= 0 && Integer.parseInt(getPrefix()) <= 32;
         }
-
-        return finalDecimal;
+        return false;
     }
 
     protected void ipAddress(){
@@ -45,7 +36,7 @@ public class Ipv4SubnetCalculator extends IpTools {
     protected void netmask(){
         String binaryNetmask = "";
         for(int i = 1; i <= 32; i++){
-            binaryNetmask += i <= getPrefix() ? "1" : "0";
+            binaryNetmask += i <=  Integer.parseInt(getPrefix()) ? "1" : "0";
             binaryNetmask += (i % 8 == 0 && i <= 24 ? "." : "");
         }
 
@@ -57,7 +48,7 @@ public class Ipv4SubnetCalculator extends IpTools {
         String binaryWildcard = "";
 
         for(int i = 1; i <= 32; i++){
-            binaryWildcard += i <= getPrefix() ? "0" : "1";
+            binaryWildcard += i <= Integer.parseInt(getPrefix()) ? "0" : "1";
             binaryWildcard += (i % 8 == 0 && i <= 24 ? "." : "");
         }
 
@@ -66,6 +57,12 @@ public class Ipv4SubnetCalculator extends IpTools {
     }
 
     protected void networkAddress(){
+        if (Integer.parseInt(getPrefix()) > 31){
+            setDecimalNetworkAddress("Unknow");
+            setBinaryNetworkAddress("");
+            return;
+        }
+
         String[] binaryIpAddressOctet = getBinaryIpAddress().split("\\.");
         String[] binaryNetmaskOctet = getBinaryNetmask().split("\\.");
         String binaryNetworkAddress = "";
@@ -86,7 +83,7 @@ public class Ipv4SubnetCalculator extends IpTools {
     }
 
     protected void broadcastAddress(){
-        if (getPrefix() > 31){
+        if (Integer.parseInt(getPrefix()) > 31){
             setDecimalBroadcastAddress("Unknow");
             setBinaryBroadcastAddress("");
             return;
@@ -112,7 +109,7 @@ public class Ipv4SubnetCalculator extends IpTools {
     }
 
     protected void firstHostAddress(){
-        if (getPrefix() >= 31) {
+        if (Integer.parseInt(getPrefix()) > 30) {
             setDecimalFirstHostAddress("Unknow");
             setBinaryFirstHostAddress(" ");
             return;
@@ -124,7 +121,7 @@ public class Ipv4SubnetCalculator extends IpTools {
     }
 
     protected void lastHostAddress(){
-        if (getPrefix() >= 31){
+        if (Integer.parseInt(getPrefix()) > 30){
             setDecimalLastHostAddress("Unknow");
             setBinaryLastHostAddress("");
             return;
@@ -135,10 +132,10 @@ public class Ipv4SubnetCalculator extends IpTools {
     }
 
     protected void totalIp(){
-        setTotalIp((int)Math.pow(2, 32-getPrefix()));
+        setTotalIp((int)Math.pow(2, 32-Integer.parseInt(getPrefix())));
     }
     protected void totalHost(){
-        setTotalHost(getTotalIp() - (getPrefix() == 32 ? 1 : 2));
+        setTotalHost(getTotalIp() - (Integer.parseInt(getPrefix()) == 32 ? 1 : 2));
     }
 
     protected void ipClass(){

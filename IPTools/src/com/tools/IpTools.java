@@ -25,9 +25,9 @@ public abstract class IpTools {
     public IpTools(String[] ipAddress, String prefix){
         this.ipAddress = ipAddress;
         this.prefix = prefix;
-        this.validIp = checkIpAddress(ipAddress);
-        this.validPrefix = checkPrefix(prefix);
-        if (checkIpAddress(ipAddress) && checkPrefix(prefix)){
+        this.validIp = checkIpAddress();
+        this.validPrefix = checkPrefix();
+        if (this.validIp && this.validPrefix){
             init();
         }
     }
@@ -45,99 +45,75 @@ public abstract class IpTools {
         ipClass();
     }
 
-    private boolean checkIpAddress(String[] ipAddress){
-        for (String octet : ipAddress){
-            if (octet.equals("") || Integer.parseInt(octet) > 255 || Integer.parseInt(octet) < 0){
-                return false;
+    protected String decimalToBinary(String decimal){
+        String[] octet = decimal.split("\\.");
+        String finalBinary = "";
+        for(int i = 0; i < 4; i++){
+            String binary = Integer.toBinaryString(Integer.parseInt(octet[i]));
+            while(binary.length() < 8){
+                binary = "0" + binary;
             }
-        }
-        return true;
-    }
 
-    private boolean checkPrefix(String prefix){
-        if (!prefix.equals("")){
-            return Integer.parseInt(prefix) >= 0 && Integer.parseInt(prefix) <= 32;
+            finalBinary += binary + (i <=2 ? "." : "");
         }
-        return false;
-    }
 
+        return finalBinary;
+    };
+    protected String binaryToDecimal(String binary){
+        String[] octet = binary.split("\\.");
+        String finalDecimal = "";
+        for(int i = 0; i < 4; i++){
+            finalDecimal += Integer.parseInt(octet[i], 2) + (i <= 2 ? "." : "");
+        }
+
+        return finalDecimal;
+    };
+
+    //Setter
     protected void setDecimalIpAddress(String decimalIpAddress) { this.decimalIpAddress = decimalIpAddress;}
-
     protected void setBinaryIpAddress(String binaryIpAddress) {this.binaryIpAddress = binaryIpAddress;}
-
     protected void setDecimalNetmask(String decimalNetmask) {this.decimalNetmask = decimalNetmask;}
-
     protected void setBinaryNetmask(String binaryNetmask) {this.binaryNetmask = binaryNetmask;}
-
     protected void setDecimalWildcard(String decimalWildcard) {this.decimalWildcard = decimalWildcard;}
-
     protected void setBinaryWildcard(String binaryWildcard) {this.binaryWildcard = binaryWildcard;}
-
     protected void setDecimalNetworkAddress(String decimalNetworkAddress) {this.decimalNetworkAddress = decimalNetworkAddress;}
-
     protected void setBinaryNetworkAddress(String binaryNetworkAddress) {this.binaryNetworkAddress = binaryNetworkAddress;}
-
     protected void setDecimalBroadcastAddress(String decimalBroadcastAddress) {this.decimalBroadcastAddress = decimalBroadcastAddress;}
-
     protected void setBinaryBroadcastAddress(String binaryBroadcastAddress) {this.binaryBroadcastAddress = binaryBroadcastAddress;}
-
     protected void setDecimalFirstHostAddress(String decimalFirstHostAddress) {this.decimalFirstHostAddress = decimalFirstHostAddress;}
-
     protected void setBinaryFirstHostAddress(String binaryFirstHostAddress) {this.binaryFirstHostAddress = binaryFirstHostAddress;}
-
     protected void setDecimalLastHostAddress(String decimalEndHostAddress) {this.decimalLastHostAddress = decimalEndHostAddress;}
-
     protected void setBinaryLastHostAddress(String binaryEndHostAddress) {this.binaryLastHostAddress = binaryEndHostAddress;}
-
     protected void setTotalHost(int totalHost) {this.totalHost = totalHost;}
-
     protected void setTotalIp(int totalIp) {this.totalIp = totalIp;}
+    protected void setIpClass(String ipClass) {this.ipClass = ipClass;}
 
-    public void setIpClass(String ipClass) {this.ipClass = ipClass;}
-
-    public String[] getIpAddress() {return ipAddress;}
-
-    protected int getPrefix() {return Integer.parseInt(prefix);}
-
+    // Getter
+    protected String[] getIpAddress() {return ipAddress;}
+    protected String getPrefix() {return prefix;}
     public String getDecimalIpAddress() {return decimalIpAddress;}
-
     public String getBinaryIpAddress() {return binaryIpAddress;}
-
     public String getDecimalNetmask() {return decimalNetmask;}
-
     public String getBinaryNetmask() {return binaryNetmask;}
-
     public String getDecimalWildcard() {return decimalWildcard;}
-
     public String getBinaryWildcard() {return binaryWildcard;}
-
     public String getDecimalNetworkAddress() {return decimalNetworkAddress;}
-
     public String getBinaryNetworkAddress() {return binaryNetworkAddress;}
-
     public String getDecimalBroadcastAddress() {return decimalBroadcastAddress;}
-
     public String getBinaryBroadcastAddress() {return binaryBroadcastAddress;}
-
     public String getDecimalFirstHostAddress() { return decimalFirstHostAddress;}
-
     public String getBinaryFirstHostAddress() {return binaryFirstHostAddress;}
-
     public String getDecimalLastHostAddress() {return decimalLastHostAddress;}
-
     public String getBinaryLastHostAddress() {return binaryLastHostAddress;}
-
     public int getTotalHost() {return totalHost;}
     public int getTotalIp() {return totalIp;}
-
     public String getipClass() {return ipClass;}
-
     public boolean isValidIp() {return validIp;}
-
     public boolean isValidPrefix() {return validPrefix;}
 
-    protected abstract String decimalToBinary(String decimal);
-    protected abstract String binaryToDecimal(String binary);
+    // Abstract Method
+    protected abstract boolean checkIpAddress();
+    protected abstract boolean checkPrefix();
     protected abstract void ipAddress();
     protected abstract void netmask();
     protected abstract void wildcard();
